@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Example</title>
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <a href="/">Main</a>
+    <a href="/add_exstenstions">Add exstension URLs</a>
+    <!-- <a href="/add_keywords">Add correct keywords</a> -->
+    <form id="dataForm">
+      <label for="searchQueries">Search queries</label>
+      <textarea  id="searchQueries" name="searchQueries" placeholder="Enter search query" required></textarea>
+  
+      <label for="parseType">Parse type</label>
+      <input class="input" id="parseType" name="parseType" placeholder="Enter parse type (week/month/year/all)" required>
+
+      <label for="subscribers">Subscribers</label>
+      <input class="input" type="number" id="subscribers" name="subscribers" placeholder="Enter count of subscribers" value="0">
+
+      <label for="views">Views</label>
+      <input class="input" type="number" id="views" name="views" placeholder="Enter count of views" value="0" required>
+
+      <button type="submit">Run</button>
+    </form>
+  
+    <div id="messages">
+
+    </div>
+  </div>
+
+  <script src="static/js/socket.io.min.js"></script>
+  <script src="static/js/main.js"></script>
+</body>
+</html>

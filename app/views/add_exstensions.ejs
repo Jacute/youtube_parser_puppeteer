@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Example</title>
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <a href="/">Main</a>
+    <a href="/add_exstenstions">Add exstension URLs</a>
+    <!-- <a href="/add_keywords">Add correct keywords</a> -->
+    <form id="dataForm">
+        <textarea id="exstensions" name="extensions" placeholder="Enter extension (like google.com, yandex.ru)"></textarea>
+        <button type="submit">Submit</button>
+    </form>
+  
+    <div id="messages">
+      <% exstensions.forEach((exstension) => { %>
+        <p><%= exstension %></p>
+      <% }); %>
+    </div>
+    
+  </div>
+  <script src="static/js/exstensions.js"></script>
+</body>
+</html>

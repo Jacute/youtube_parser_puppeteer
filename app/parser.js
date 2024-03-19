@@ -51,7 +51,6 @@ class YoutubeParser extends EventEmitter {
         }
 
         let videoUrls = await this.getVideoUrls(page);
-        videoUrls = videoUrls.slice(0, 5);
 
         let result = [];
         for (var i = 0; i < videoUrls.length; i++) {

@@ -17,6 +17,9 @@ const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
 class YoutubeParser extends EventEmitter {
     constructor(searchReqs, incorrectUrls, parseType, subscribers, views) {
         super();
+
+        this.browser = null;
+
         this.host = 'https://www.youtube.com';
 
         this.searchReqs = searchReqs;
@@ -30,8 +33,8 @@ class YoutubeParser extends EventEmitter {
     /**
      * @param {import('puppeteer').Browser} browser
      */
-    async parse(browser) {
-        const page = await browser.newPage();
+    async parse() {
+        const page = await this.browser.newPage();
     
         await page.setRequestInterception(true);
         await page.setDefaultNavigationTimeout(1000 * 60);
@@ -214,15 +217,20 @@ class YoutubeParser extends EventEmitter {
             
     }
 
+    async close() {
+        if (this.browser) {
+            await this.browser.close();
+        }
+    }
+
     async start() {
         var filepath;
 
         puppeteer.use(StealthPlugin());
         this.mode = await this.getMode();
 
-        let browser;
         try {
-            browser = await puppeteer.launch({ 
+            this.browser = await puppeteer.launch({ 
                 args: ['--no-sandbox'], 
                 headless: (() => {
                     if (process.env.HEADLESS === 'True') {
@@ -237,7 +245,7 @@ class YoutubeParser extends EventEmitter {
             this.emit('output', "=== START PARSING ===");
             
             try {
-                var result = await this.parse(browser);
+                var result = await this.parse();
             } catch (e) {
                 this.emit('error', e);
                 return;
@@ -253,9 +261,7 @@ class YoutubeParser extends EventEmitter {
         } catch (error) {
             this.emit('error', error);
         } finally {
-            if (browser) {
-                await browser.close();
-            }
+            await this.close();
         }
         return filepath;
     }

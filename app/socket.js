@@ -8,12 +8,19 @@ function socketRun(server) {
 
     io.on('connection', (socket) => {
         console.log('Connection successful. Socket ID: ' + socket.id);
+        
+        const parser = new YoutubeParser();
+        socket.parser = parser;
 
-        socket.on('run', (searchQueries, parseType, subscribers, views) => {
+        socket.on('run', (searchReqs, parseType, subscribers, views) => {
             // let correctKeywords = readFile(process.env.CORRECT_KEYWORDS_PATH).split('\n');
             let incorrectUrls = readFile('./exstensionUrls.txt').split('\n');
 
-            const parser = new YoutubeParser(searchQueries, incorrectUrls, parseType, subscribers, views);
+            socket.parser.searchReqs = searchReqs;
+            socket.parser.parseType = parseType;
+            socket.parser.subscribers = subscribers;
+            socket.parser.views = views;
+            socket.parser.incorrectUrls = incorrectUrls;
 
             parser.on('output', (output) => {
                 console.log(output);
@@ -28,8 +35,11 @@ function socketRun(server) {
 
             try {
                 parser.start().then((filepath) => {
-                    let pathes = filepath.split('/');
-                    if (filepath) socket.emit('end', 'data/' + pathes[pathes.length - 1]);
+                    if (filepath) {
+                        let pathes = filepath.split('/');
+                        socket.emit('end', 'data/' + pathes[pathes.length - 1]);
+                    }
+                    parser.close();
                 });
             } catch (err) {
                 socket.emit('error', err);
@@ -38,6 +48,7 @@ function socketRun(server) {
 
         socket.on('disconnect', () => {
             console.log('Connection is broken. Socket ID: ' + socket.id);
+            socket.parser.close();
         });
     })
 }

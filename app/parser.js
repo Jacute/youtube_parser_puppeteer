@@ -147,7 +147,7 @@ class YoutubeParser extends EventEmitter {
             await page.goto(this.host + `/results?search_query=${this.searchReqs[i]}&sp=${this.mode}`);
             await page.waitForTimeout(2000);
 
-            // await this.autoScroll(page);
+            await this.autoScroll(page);
 
             let queryUrls = await Promise.all((await page.$x('//ytd-video-renderer/div/ytd-thumbnail/a')).map(async element => {
                 return this.host + (await element.evaluate(element => element.getAttribute('href')));

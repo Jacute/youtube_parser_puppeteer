@@ -14,11 +14,11 @@ form.addEventListener('submit', (event) => {
     .then((response) => {
         if (response.status !== 200) {
             console.error('Error: ' + response.text);
+        } else {
+            location.reload();
         }
     })
     .catch((error) => {
         console.error(error);
     });
-
-    location.reload();
 });

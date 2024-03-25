@@ -4,7 +4,7 @@ const path = require('path');
 const http = require('http');
 
 const { socketRun } = require('./socket');
-const { writeFile, readFile } = require('./utils');
+const { writeFile, readFile, getData } = require('./utils');
 const { logger } = require('./logger')
 
 require('dotenv').config();
@@ -56,6 +56,11 @@ app.post('/submit_exstensions', (req, res) => {
 //         res.status(400).send('BAD');
 //     }
 // });
+
+app.get('/data', (req, res) => {
+    const data = getData();
+    res.render('data', { data });
+});
 
 const HOST = process.env.HOST || '127.0.0.1';
 const PORT = process.env.PORT || 3000;

@@ -37,4 +37,27 @@ function getCurrentDateTime() {
     return `${day}.${month}.${year}-${hours}:${minutes}:${seconds}`;
 }
 
-module.exports = { readFile, appendFile, writeFile, getCurrentDateTime };
+function getData() {
+    let result = {};
+
+    let files = fs.readdirSync("app/data", (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        return data;
+    });
+
+    files = files.map((filename) => {
+        return {
+            name: filename,
+            href: "/data/" + filename
+        };
+    });
+
+    console.log(files)
+
+    return files;
+}
+
+module.exports = { readFile, appendFile, writeFile, getCurrentDateTime, getData };

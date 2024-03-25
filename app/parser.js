@@ -76,11 +76,10 @@ class YoutubeParser extends EventEmitter {
 
         await page.goto(url);
 
-        await page.waitForSelector('tp-yt-paper-button#expand-sizer', {timeout: 60 * 1000});
-        await page.click('tp-yt-paper-button#expand-sizer');
-        await page.waitForTimeout(2000);
+        await page.waitForSelector('tp-yt-paper-button#expand');
+        await page.click('tp-yt-paper-button#expand');
 
-        const description = await page.$('#description-inline-expander yt-attributed-string');
+        const description = await page.$('#description-inline-expander');
         const text = (await page.evaluate(element => element.innerText, description)).toLowerCase();
 
         // let isValid = await this.filterKeywords(text);
@@ -142,15 +141,18 @@ class YoutubeParser extends EventEmitter {
     async getVideoUrls(page) {
         let urls = [];
         for (let i = 0; i < this.searchReqs.length; i++) {
-            this.emit(`Parsing ${this.searchReqs[i]}`);
+            this.emit('output', `Parsing ${this.searchReqs[i]}`);
 
             await page.goto(this.host + `/results?search_query=${this.searchReqs[i]}&sp=${this.mode}`);
             await page.waitForTimeout(2000);
 
-            await this.autoScroll(page);
+            // await this.autoScroll(page);
 
             let queryUrls = await Promise.all((await page.$x('//ytd-video-renderer/div/ytd-thumbnail/a')).map(async element => {
-                return this.host + (await element.evaluate(element => element.getAttribute('href')));
+                let href = (await element.evaluate(element => element.getAttribute('href')));
+                if (!href.includes('shorts')) {
+                    return this.host + href;
+                }
             }));
             urls = [...urls, ...queryUrls]
         };
@@ -232,6 +234,8 @@ class YoutubeParser extends EventEmitter {
         try {
             this.browser = await puppeteer.launch({ 
                 args: ['--no-sandbox'], 
+                defaultViewport: { width: 800, height: 600 },
+                protocolTimeout: 1000 * 60 * 2,
                 headless: (() => {
                     if (process.env.HEADLESS === 'True') {
                         return 'new';

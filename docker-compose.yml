@@ -10,6 +10,8 @@ services:
       - '127.0.0.1:3000:3000'
     networks:
       - mynetwork
+    volumes:
+      - ./app/data:./app/data
     restart: on-failure
   nginx:
     image: nginx

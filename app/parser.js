@@ -148,12 +148,13 @@ class YoutubeParser extends EventEmitter {
 
             await this.autoScroll(page);
 
-            let queryUrls = await Promise.all((await page.$x('//ytd-video-renderer/div/ytd-thumbnail/a')).map(async element => {
+            let queryUrls = await Promise.all(page.$x('//ytd-video-renderer/div/ytd-thumbnail/a').map(async element => {
                 let href = (await element.evaluate(element => element.getAttribute('href')));
                 if (!href.includes('shorts')) {
                     return this.host + href;
                 }
             }));
+            queryUrls = queryUrls.filter(element => element !== undefined);
             urls = [...urls, ...queryUrls]
         };
 

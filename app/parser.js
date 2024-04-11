@@ -91,13 +91,13 @@ class YoutubeParser extends EventEmitter {
 
             if (foundedUrls) {
                 foundedUrls = await this.filterUrls(foundedUrls);
-                videoResult.urls = foundedUrls.join(',');
+                videoResult.urls = foundedUrls.join(';');
             } else {
                 videoResult.urls = '';
             }
             
             if (foundedEmails) {
-                videoResult.emails = foundedEmails.join(',');
+                videoResult.emails = foundedEmails.join(';');
             } else {
                 videoResult.emails = '';
             }
@@ -155,7 +155,7 @@ class YoutubeParser extends EventEmitter {
                 }
             }));
             queryUrls = queryUrls.filter(element => element !== undefined);
-            urls = [...urls, ...queryUrls]
+            urls = [...urls, ...queryUrls];
         };
 
         return urls;
@@ -236,7 +236,7 @@ class YoutubeParser extends EventEmitter {
             this.browser = await puppeteer.launch({ 
                 args: ['--no-sandbox'], 
                 defaultViewport: { width: 800, height: 600 },
-                protocolTimeout: 1000 * 60 * 2,
+                protocolTimeout: 1000 * 60 * 60,
                 headless: (() => {
                     if (process.env.HEADLESS === 'True') {
                         return 'new';

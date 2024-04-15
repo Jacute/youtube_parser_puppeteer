@@ -79,6 +79,12 @@ class YoutubeParser extends EventEmitter {
         await page.waitForSelector('tp-yt-paper-button#expand');
         await page.click('tp-yt-paper-button#expand');
 
+        const viewsElem = await page.$('yt-formatted-string#info span')
+        const views = parseInt((await page.evaluate(element => element.innerText, viewsElem)).replace(/\s/g, '').replace(/,/g, '').match(/\d+/g)[0]);
+        if (views < this.views) {
+            return null;
+        }
+
         const description = await page.$('#description-inline-expander');
         const text = (await page.evaluate(element => element.innerText, description)).toLowerCase();
 
@@ -91,13 +97,13 @@ class YoutubeParser extends EventEmitter {
 
             if (foundedUrls) {
                 foundedUrls = await this.filterUrls(foundedUrls);
-                videoResult.urls = foundedUrls.join(';');
+                videoResult.urls = foundedUrls.join(',');
             } else {
                 videoResult.urls = '';
             }
             
             if (foundedEmails) {
-                videoResult.emails = foundedEmails.join(';');
+                videoResult.emails = foundedEmails.join(',');
             } else {
                 videoResult.emails = '';
             }
@@ -146,16 +152,15 @@ class YoutubeParser extends EventEmitter {
             await page.goto(this.host + `/results?search_query=${this.searchReqs[i]}&sp=${this.mode}`);
             await page.waitForTimeout(2000);
 
-            await this.autoScroll(page);
+            // await this.autoScroll(page);
 
-            let queryUrls = await Promise.all(page.$x('//ytd-video-renderer/div/ytd-thumbnail/a').map(async element => {
+            let queryUrls = await Promise.all((await page.$x('//ytd-video-renderer/div/ytd-thumbnail/a')).map(async element => {
                 let href = (await element.evaluate(element => element.getAttribute('href')));
                 if (!href.includes('shorts')) {
                     return this.host + href;
                 }
             }));
-            queryUrls = queryUrls.filter(element => element !== undefined);
-            urls = [...urls, ...queryUrls];
+            urls = [...urls, ...queryUrls]
         };
 
         return urls;
@@ -236,7 +241,7 @@ class YoutubeParser extends EventEmitter {
             this.browser = await puppeteer.launch({ 
                 args: ['--no-sandbox'], 
                 defaultViewport: { width: 800, height: 600 },
-                protocolTimeout: 1000 * 60 * 60,
+                protocolTimeout: 1000 * 60 * 2,
                 headless: (() => {
                     if (process.env.HEADLESS === 'True') {
                         return 'new';

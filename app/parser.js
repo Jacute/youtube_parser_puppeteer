@@ -79,12 +79,14 @@ class YoutubeParser extends EventEmitter {
         await page.waitForSelector('tp-yt-paper-button#expand');
         await page.click('tp-yt-paper-button#expand');
 
+        await page.waitForSelector('yt-formatted-string#info span');
         const viewsElem = await page.$('yt-formatted-string#info span')
         const views = parseInt((await page.evaluate(element => element.innerText, viewsElem)).replace(/\s/g, '').replace(/,/g, '').match(/\d+/g)[0]);
         if (views < this.views) {
             return null;
         }
 
+        await page.waitForSelector('#description-inline-expander');
         const description = await page.$('#description-inline-expander');
         const text = (await page.evaluate(element => element.innerText, description)).toLowerCase();
 
